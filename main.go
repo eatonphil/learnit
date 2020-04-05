@@ -12,23 +12,20 @@ import (
 	"google.golang.org/api/calendar/v3"
 )
 
-func getWords(inputFile string) map[string]string {
+func getWords(inputFile string) []string {
 	dict, err := ioutil.ReadFile(inputFile)
 	if err != nil {
 		fmt.Println(err)
 		return nil
 	}
 
-	words := map[string]string{}
+	words := []string{}
 	for _, line := range strings.Split(string(dict), "\n") {
 		if line == "" {
 			continue
 		}
 
-		sections := strings.SplitN(line, ":", 2)
-		word := sections[0]
-		trans := sections[1]
-		words[word] = trans
+		words = append(words, line)
 	}
 
 	return words
@@ -52,13 +49,11 @@ func main() {
 		log.Fatalf("Unable to retrieve Calendar client: %v", err)
 	}
 
-	i := 1
-	for word, translation := range getWords(os.Args[1]) {
+	for i, word := range getWords(os.Args[1]) {
 		// Set to 8am
 		dateTime := time.Now().AddDate(0, 0, i).Truncate(time.Hour * 24).Add(time.Hour * 12)
-		fmt.Println("Setting at", dateTime.Format(time.RFC3339), ", ", word, ":", translation)
 		event := &calendar.Event{
-			Summary: "[WOTD] " + word + ": " + translation,
+			Summary: "[WOTD] " + word,
 			Start: &calendar.EventDateTime{
 				DateTime: dateTime.Format(time.RFC3339),
 				TimeZone: "America/New_York",
@@ -75,6 +70,5 @@ func main() {
 			log.Fatalf("Unable to create event. %v\n", err)
 		}
 		fmt.Printf("Event created: %s\n", event.HtmlLink)
-		i++
 	}
 }
