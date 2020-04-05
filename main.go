@@ -20,6 +20,10 @@ func getWords() map[string]string {
 
 	words := map[string]string{}
 	for _, line := range strings.Split(string(dict), "\n") {
+		if line == "" {
+			continue
+		}
+
 		sections := strings.SplitN(line, ":", 2)
 		word := sections[0]
 		trans := sections[1]
@@ -53,7 +57,7 @@ func main() {
 		dateTime := time.Now().AddDate(0, 0, i).Truncate(time.Hour * 24).Add(time.Hour * 12)
 		fmt.Println("Setting at", dateTime.Format(time.RFC3339), ", ", word, ":", translation)
 		event := &calendar.Event{
-			Summary: word + ": " + translation,
+			Summary: "[WOTD] " + word + ": " + translation,
 			Start: &calendar.EventDateTime{
 				DateTime: dateTime.Format(time.RFC3339),
 				TimeZone: "America/New_York",
