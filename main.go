@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"io/ioutil"
 	"log"
 	"strings"
@@ -11,8 +12,8 @@ import (
 	"google.golang.org/api/calendar/v3"
 )
 
-func getWords() map[string]string {
-	dict, err := ioutil.ReadFile("input.dict")
+func getWords(inputFile string) map[string]string {
+	dict, err := ioutil.ReadFile(inputFile)
 	if err != nil {
 		fmt.Println(err)
 		return nil
@@ -52,7 +53,7 @@ func main() {
 	}
 
 	i := 1
-	for word, translation := range getWords() {
+	for word, translation := range getWords(os.Args[1]) {
 		// Set to 8am
 		dateTime := time.Now().AddDate(0, 0, i).Truncate(time.Hour * 24).Add(time.Hour * 12)
 		fmt.Println("Setting at", dateTime.Format(time.RFC3339), ", ", word, ":", translation)
